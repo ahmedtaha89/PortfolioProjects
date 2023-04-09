@@ -13,16 +13,17 @@ order by 3,4
 
 -- Select Data that we are going to be starting with
 
-Select Location, date, total_cases, new_cases, total_deaths, population
+Select lower(Location), FORMAT(date,'dd/MM/yyyy') AS FormattedDate, total_cases, new_cases, total_deaths, population
 From CovidDeaths
 Where continent is not null 
 order by 1,2
 
 
+
 -- Total Cases vs Total Deaths
 -- Shows likelihood of dying if you contract covid in your country
 
-Select Location, date, total_cases,total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
+Select Location, FORMAT(date,'dd/MM/yyyy') AS FormattedDate, total_cases,total_deaths, (total_deaths/total_cases)*100 as DeathPercentage
 From .CovidDeaths
 Where location like '%states%'
 and continent is not null 
@@ -32,7 +33,7 @@ order by 1,2
 -- Total Cases vs Population
 -- Shows what percentage of population infected with Covid
 
-Select Location, date, Population, total_cases,  (total_cases/population)*100 as PercentPopulationInfected
+Select Location, FORMAT(date,'dd/MM/yyyy') AS FormattedDate, Population, total_cases,  (total_cases/population)*100 as PercentPopulationInfected
 From CovidDeaths
 --Where location like '%states%'
 order by 1,2
@@ -40,7 +41,7 @@ order by 1,2
 
 -- Countries with Highest Infection Rate compared to Population
 
-Select Location, Population, MAX(total_cases) as HighestInfectionCount,  Max((total_cases/population))*100 as PercentPopulationInfected
+Select Location, Population, MAX(total_cases) as HighestInfectionCount,  Round(Max((total_cases/population))*100,3) as PercentPopulationInfected
 From .CovidDeaths
 --Where location like '%states%'
 Group by Location, Population
@@ -49,10 +50,10 @@ order by PercentPopulationInfected desc
 
 -- Countries with Highest Death Count per Population
 
-Select distinct Location,  MAX(cast(Total_deaths as int)) over(partition by  Location ) as TotalDeathCount
+Select distinct Location, MAX(cast(Total_deaths as int)) over(partition by  Location ) as TotalDeathCount
 From .CovidDeaths
 Where continent is not null 
---Group by Location
+--Group by Location 
 order by TotalDeathCount desc
 
 
@@ -72,11 +73,11 @@ order by TotalDeathCount desc
 
 -- GLOBAL NUMBERS
 
-Select SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(New_Cases)*100 as DeathPercentage
+Select continent ,  SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(New_Cases)*100 as DeathPercentage
 From CovidDeaths
---Where location like '%states%'
-where continent is not null 
---Group By date
+Where continent like '%af%'
+and continent is not null 
+Group By continent
 order by 1,2
 
 
@@ -84,7 +85,7 @@ order by 1,2
 -- Total Population vs Vaccinations
 -- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
-Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+Select dea.continent, dea.location, FORMAT(dea.date,'dd/MM/yyyy') AS FormattedDate, dea.population, vac.new_vaccinations
 , SUM(CONVERT(int,vac.new_vaccinations)) OVER (Partition by dea.Location Order by dea.location, dea.Date) as RollingPeopleVaccinated
 --, (RollingPeopleVaccinated/population)*100
 From CovidDeaths dea
