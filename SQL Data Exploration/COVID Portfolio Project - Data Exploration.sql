@@ -49,11 +49,10 @@ order by PercentPopulationInfected desc
 
 -- Countries with Highest Death Count per Population
 
-Select Location, MAX(cast(Total_deaths as int)) as TotalDeathCount
+Select distinct Location,  MAX(cast(Total_deaths as int)) over(partition by  Location ) as TotalDeathCount
 From .CovidDeaths
---Where location like '%states%'
 Where continent is not null 
-Group by Location
+--Group by Location
 order by TotalDeathCount desc
 
 
