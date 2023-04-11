@@ -6,19 +6,23 @@ Cleaning Data in SQL Queries
 
 
 Select *
-From PortfolioProject.dbo.NashvilleHousing
+From NashvilleHousing;
 
 --------------------------------------------------------------------------------------------------------------------------
 
 -- Standardize Date Format
 
 
-Select saleDateConverted, CONVERT(Date,SaleDate)
-From PortfolioProject.dbo.NashvilleHousing
+select SaleDate , format(SaleDate, 'dd/MM/yyyy') from NashvilleHousing;
+
+select SaleDate from NashvilleHousing;
 
 
 Update NashvilleHousing
-SET SaleDate = CONVERT(Date,SaleDate)
+SET SaleDate = format(SaleDate, 'dd/MM/yyyy')
+
+
+select SaleDate from NashvilleHousing;
 
 -- If it doesn't Update properly
 
@@ -33,8 +37,9 @@ SET SaleDateConverted = CONVERT(Date,SaleDate)
 
 -- Populate Property Address data
 
-Select *
-From PortfolioProject.dbo.NashvilleHousing
+Select 
+	concat([UniqueID ],LandUse)
+From NashvilleHousing
 --Where PropertyAddress is null
 order by ParcelID
 
@@ -281,7 +286,6 @@ DROP COLUMN OwnerAddress, TaxDistrict, PropertyAddress, SaleDate
 --FROM OPENROWSET('Microsoft.ACE.OLEDB.12.0',
 --    'Excel 12.0; Database=C:\Users\alexf\OneDrive\Documents\SQL Server Management Studio\Nashville Housing Data for Data Cleaning Project.csv', [Sheet1$]);
 --GO
-
 
 
 
